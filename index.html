@@ -94,8 +94,13 @@
                         if (lueckenClean.length !== loesungClean.length) {
                             res.innerHTML = "The length of both texts are not the same! (Spacing before or after)";
                         } else {
+                            var combined = [];
+
                             for (i = 0; i < lueckenClean.length; i++) {
-                                var combined = [];
+                                var newLine = false;
+                                if (lueckenClean[i].search(/(\r\n|\n|\r)/gm) !== -1) {
+                                    newLine = true;
+                                }
                                 if (lueckenClean[i].includes("_")) {
                                     count++;
 
@@ -118,14 +123,18 @@
 
                                     tempL.splice(1, 0, "{" + score + ":SAC:=" + aLoesung + "}");
 
-                                    lueckenClean[i] = tempL.join("").replace(/(\r\n|\n|\r)/gm, "<br>");
+                                    lueckenClean[i] = tempL.join("");
                                 }
                                 len += loesungClean[i].length;
                                 words++;
-                                combined.push(lueckenClean[i]);
+                                if (newLine) {
+                                    combined.push(lueckenClean[i] + "<br/>");
+                                } else {
+                                    combined.push(lueckenClean[i]);
+                                }
                             }
 
-                            res.innerHTML = lueckenClean.join(" ");
+                            res.innerHTML = combined.join(" ");
                         }
                     }
 
