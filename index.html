@@ -21,6 +21,9 @@
     </style>
 </head>
 <body>
+<a href="https://github.com/itsmeyaw/LueckenTextToMoodleConverter" style="position: fixed; right: 0;">
+    <img loading="lazy" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
+</a>
 <div class="container-fluid">
     <div class="row p-5">
         <div class="col-12">
@@ -41,6 +44,15 @@
         <div class="col-12">
             <div id="result"></div>
         </div>
+        <div class="col-12 col-md-3">
+            Length: <span id="len"></span>
+        </div>
+        <div class="col-12 col-md-">
+            Words: <span id="words"></span>
+        </div>
+        <div class="col-12 col-md-">
+            Luecken: <span id="lueckenCount"></span>
+        </div>
     </div>
 </div>
 <script type="text/javascript">
@@ -49,6 +61,9 @@
         let luecken = document.getElementById("luecken").value;
         let loesung = document.getElementById("loesung").value;
         let res = document.getElementById("result");
+        var count = 0;
+        var len = 0;
+        var words = 0;
 
         if (luecken == null || luecken === "" || loesung == null || loesung === "") {
             res.innerHTML = "Both Lückentext and Lösung cannot be empty";
@@ -56,19 +71,27 @@
             let lueckenArr = luecken.split(/\s+/);
             let loesungArr = loesung.split(/\s+/);
 
-            console.log(lueckenArr);
-            console.log(loesungArr);
-
             if (lueckenArr.length !== loesungArr.length) {
                 res.innerHTML = "The length of both texts are not the same! (Spacing before or after)";
             } else {
                 for (var i = 0; i < lueckenArr.length; i++) {
-                    lueckenArr[i] = lueckenArr[i].replaceAll(/_+/g, "{" + score + ":SAC:=" + loesungArr[i].replace(lueckenArr[i].replaceAll(/[\W]+|_+/g, ""), "").replaceAll(/[\W+]/g, "") + "}");
+                    if (lueckenArr[i].includes("_")) {
+                        count++;
+                        let lcleaned = lueckenArr[i].replaceAll(/_+|(?<=_)(?!ä|ö|ü|-|ß)[\W]/gmi, "");
+                        let acleaned = loesungArr[i].replace(lueckenArr[i].replaceAll(lcleaned, "")).replaceAll(/(?!ä|ö|ü|-|ß)[\W]/gmi, "");
+                        lueckenArr[i] = lcleaned + "{" + score + ":SAC:=" + acleaned.replaceAll(lcleaned, "") + "}";
+                    }
+                    len += loesungArr[i].length;
+                    words++;
                 }
 
                 res.innerHTML = lueckenArr.join(" ");
             }
         }
+
+        document.getElementById("len").innerHTML = len;
+        document.getElementById("lueckenCount"). innerHTML = count;
+        document.getElementById("words").innerHTML = words;
     }
 </script>
 </body>
